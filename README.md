@@ -904,187 +904,208 @@ erDiagram
 
 ### 6.1. Схема
 
-Таблицы из раздела 5 разложены по хранилищам. Для каждой указаны ключ шардирования и индексы.
+В заголовке каждой таблицы указаны СУБД и ключ шардирования, у полей — типы конкретной СУБД, в комментариях к полям — индексы. Связи между разными хранилищами поддерживает приложение: внешних ключей между базами нет.
 
 ```mermaid
-flowchart LR
-    subgraph PG_MAIN["PostgreSQL main, без шардинга"]
-        users["users<br/>PK user_id<br/>UNIQUE phone"]
-        sessions["sessions<br/>PK session_id<br/>UNIQUE refresh_token_hash<br/>idx user_id"]
-        dict["categories, cities<br/>PK id"]
-        fav["favorites<br/>PK (user_id, ad_id)"]
-    end
-    subgraph PG_ADS["PostgreSQL ads, 8 шардов по ad_id"]
-        ads["ads<br/>PK ad_id<br/>idx (seller_id, status, created_at)<br/>idx (closed_at) WHERE closed<br/>+ main_photo_id"]
-        photos["ad_photos<br/>PK photo_id<br/>idx (ad_id, position)"]
-    end
-    subgraph PG_CHATS["PostgreSQL chats, 4 шарда"]
-        chats["chats, шард по chat_id<br/>PK chat_id = hash(ad_id, buyer_id)<br/>+ last_message_preview"]
-        members["chat_members, шард по user_id<br/>PK (user_id, chat_id)<br/>idx (user_id, last_message_at DESC)<br/>+ last_message_at, last_message_id"]
-    end
-    subgraph CASS["Cassandra"]
-        msgs["messages<br/>partition chat_id<br/>clustering message_id DESC"]
-    end
-    subgraph S3["Объектное хранилище S3, Ceph"]
-        files["photo_files<br/>key = photo_id/variant"]
-    end
-    subgraph ES["OpenSearch"]
-        idx["search_index<br/>22 шарда по ad_id<br/>+ title, price_kop, thumb_photo_id"]
-    end
-    subgraph CH["ClickHouse events, 2 шарда"]
-        ev["rec_events<br/>PARTITION BY day<br/>ORDER BY (user_id, ts)<br/>TTL 30 дней"]
-    end
-    subgraph DWH["ClickHouse DWH, 4 шарда"]
-        facts["fact_ad_events, fact_messages,<br/>fact_ad_changes<br/>PARTITION BY month<br/>ORDER BY (category_id, city_id, ts)<br/>TTL 365 дней"]
-        dims["dim_* — ReplacingMergeTree<br/>agg_* — SummingMergeTree"]
-    end
-    subgraph TT["Tarantool, vshard"]
-        uf["user_features<br/>bucket по user_id"]
-        af["ad_features<br/>bucket по ad_id"]
-    end
-    subgraph REDIS["Redis Cluster"]
-        cache["feed_cache, ad_card_cache<br/>sms_codes, online_connections<br/>idempotency"]
-    end
-    subgraph KAFKA["Kafka"]
-        q["rec-events, ad-changes,<br/>message-delivery, media-tasks,<br/>cdc.*"]
-    end
+erDiagram
+    users ||--o{ sessions : ""
+    users ||--o{ favorites : ""
+    users ||--o{ ads : ""
+    ads ||--|{ ad_photos : ""
+    ad_photos ||--|{ photo_files : ""
+    ads ||--o| search_index : ""
+    ads ||--o| ad_features : ""
+    users ||--o| user_features : ""
+    ads ||--o{ chats : ""
+    chats ||--|{ chat_members : ""
+    chats ||--o{ messages : ""
+    users ||--o{ rec_events : ""
+    ads ||--o{ fact_ad_events : ""
 
-    ads --> photos
-    photos --> files
-    ads -. ad-changes .-> q
-    q -. индексация .-> idx
-    q -. признаки .-> af
-    q -. инвалидация .-> cache
-    q -. события .-> ev
-    ev -. агрегация .-> uf
-    PG_MAIN -. CDC Debezium .-> q
-    PG_ADS -. CDC Debezium .-> q
-    PG_CHATS -. CDC Debezium .-> q
-    q -. события, CDC, метаданные сообщений .-> facts
-    facts -. ночной пересчёт .-> dims
-    chats --> msgs
-    chats --> members
+    users["users | PG main, без шардинга"] {
+        bigint user_id PK
+        bigint phone UK "UNIQUE"
+        varchar name
+        int city_id
+        smallint type
+        smallint status
+        smallint avatar_version
+        varchar about
+        int notify_flags
+        timestamptz created_at
+        timestamptz last_seen_at
+    }
+    sessions["sessions | PG main"] {
+        bigint session_id PK
+        bigint user_id FK "idx"
+        bytea refresh_token_hash UK "UNIQUE"
+        smallint device_type
+        int app_version
+        timestamptz expires_at
+    }
+    favorites["favorites | PG main"] {
+        bigint user_id PK
+        bigint ad_id PK
+        timestamptz created_at
+    }
+    ads["ads | PG ads, 8 шардов по hash(ad_id)"] {
+        bigint ad_id PK "shard key"
+        bigint seller_id FK "idx (seller_id, status, created_at DESC)"
+        int category_id
+        int city_id
+        smallint status
+        bigint price_kop
+        varchar title
+        text description
+        int_array attributes
+        bigint main_photo_id "денормализация"
+        timestamptz created_at
+        timestamptz closed_at "idx WHERE status = closed"
+    }
+    ad_photos["ad_photos | PG ads, шард по ad_id"] {
+        bigint photo_id PK
+        bigint ad_id FK "idx (ad_id, position)"
+        smallint position
+        smallint status
+    }
+    photo_files["photo_files | Ceph S3"] {
+        string key PK "photo_id/variant"
+        bytes content
+    }
+    search_index["search_index | OpenSearch, 22 шарда по ad_id"] {
+        long ad_id PK
+        text tokens "инвертированный индекс"
+        integer category_id "фильтр"
+        integer city_id "фильтр"
+        long price_kop "фильтр"
+        keyword title "денормализация"
+        long thumb_photo_id "денормализация"
+    }
+    chats["chats | PG chats, 4 шарда по chat_id"] {
+        uuid chat_id PK "hash(ad_id, buyer_id)"
+        bigint ad_id
+        bigint buyer_id
+        bigint seller_id
+        timestamptz last_message_at
+        varchar last_message_preview "денормализация"
+    }
+    chat_members["chat_members | PG chats, шард по user_id"] {
+        bigint user_id PK "shard key"
+        uuid chat_id PK
+        timestamptz last_message_at "idx (user_id, last_message_at DESC)"
+        bigint last_message_id
+        bigint last_read_message_id
+        int unread_count
+    }
+    messages["messages | Cassandra, partition chat_id"] {
+        uuid chat_id PK "partition key"
+        bigint message_id PK "clustering DESC"
+        bigint sender_id
+        uuid client_message_id
+        text body
+    }
+    rec_events["rec_events | ClickHouse events, 2 шарда по user_id"] {
+        UInt64 user_id "ORDER BY (user_id, ts)"
+        UInt64 ad_id
+        UInt8 type
+        UInt8 source
+        UInt32 city_id
+        DateTime64 ts "PARTITION BY day, TTL 30 дней"
+    }
+    user_features["user_features | Tarantool, vshard по user_id"] {
+        unsigned user_id PK
+        varbinary embedding "128 x float16"
+    }
+    ad_features["ad_features | Tarantool, vshard по ad_id"] {
+        unsigned ad_id PK
+        varbinary embedding "128 x float16"
+        float popularity
+    }
+    fact_ad_events["fact_ad_events | ClickHouse DWH, 4 шарда"] {
+        DateTime64 ts "PARTITION BY month, TTL 365 дней"
+        UInt64 user_id
+        UInt64 ad_id "bloom_filter"
+        UInt32 category_id "ORDER BY (category_id, city_id, ts)"
+        UInt32 city_id
+        UInt8 type
+    }
 ```
 
-### 6.2. Выбор СУБД по таблицам
+Кроме таблиц на схеме: кэши ленты и карточек, SMS-коды и онлайн-соединения лежат в Redis, очереди — в Kafka. Изменения объявлений идут через Kafka в OpenSearch, Tarantool и Redis, события — в ClickHouse, а данные PostgreSQL попадают в DWH через CDC (Debezium).
 
-| Таблицы | Хранилище | Почему |
+### 6.2. Выбор СУБД
+
+| Данные | СУБД | Почему |
 | --- | --- | --- |
-| `users`, `sessions`, `categories`, `cities`, `favorites` | PostgreSQL | Нужны транзакции и уникальность (телефон, пара в избранном). Объём около 0,25 ТБ с индексами, запись редкая, поэтому хватает одного мастера с репликами |
-| `ads`, `ad_photos` | PostgreSQL, 8 шардов | Нужна строгая запись и read-your-writes для продавца. Около 1,1 ТБ с индексами — на одном сервере тяжело, особенно для бэкапов и `ALTER TABLE` |
-| `chats`, `chat_members` | PostgreSQL, 4 шарда | Нужна уникальность диалога и атомарное изменение счётчика внутри строки (`unread_count = unread_count + 1`). Записей много (7,7 тыс. строк/с), поэтому шардируем |
-| `messages` | Cassandra | Почти только добавление и чтение последней страницы по `chat_id` — это ровно её модель. Растёт на 8,5 ТБ в год, масштабируется добавлением узлов, пишет в локальный ДЦ без мастера в Москве |
-| `photo_files` | S3-совместимое хранилище (Ceph) | Файлы на 2,8 ПБ, неизменяемые. Хранятся дёшево, раздаются через CDN |
-| `search_index` | OpenSearch | Полнотекстовый поиск с фильтрами по категории, цене и городу |
-| `rec_events` | ClickHouse | Сотни тысяч вставок в секунду пачками, аналитические выборки при обучении, хорошее сжатие и удаление по TTL |
-| DWH: `fact_*`, `dim_*`, `agg_*` | ClickHouse, отдельный кластер | Колоночное хранение: отчёт читает только нужные столбцы. Числовые столбцы сжимаются в 4–10 раз. Отдельный кластер нужен, чтобы тяжёлые отчёты не мешали расчёту признаков |
-| `user_features`, `ad_features` | Tarantool | 528 тыс. чтений строк в секунду — нужна in-memory база. При этом данные сохраняются на диск (снапшот + WAL), после рестарта не надо пересчитывать |
-| `feed_cache`, `ad_card_cache`, SMS-коды, онлайн-соединения, ключи идемпотентности | Redis Cluster | Короткоживущие данные с TTL, потеря не критична |
-| Очереди | Kafka | Хранение 3 суток, несколько независимых потребителей, порядок внутри ключа |
-
-Как числовые типы из раздела 5.2 ложатся на конкретные СУБД:
-
-| Тип в схеме | PostgreSQL | Cassandra | ClickHouse | Tarantool |
-| --- | --- | --- | --- | --- |
-| `int64` (id, цена в копейках, телефон) | `bigint` | `bigint` | `UInt64` / `Int64` | `unsigned` / `integer` |
-| `int32`, `int16`, `int8` (справочники, коды статусов) | `integer`, `smallint` | `int`, `smallint`, `tinyint` | `UInt32`, `UInt16`, `UInt8` | `unsigned` |
-| `int128` (`chat_id`, `client_message_id`) | `uuid` (16 Б) | `uuid` | `UUID` / `UInt128` | `uuid` |
-| `int64` время | `timestamptz` (8 Б) | `timestamp` / время внутри `message_id` | `DateTime64(3)` | `unsigned` (мс) |
-| `bytes32` хэш | `bytea` | — | `FixedString(32)` | `varbinary` |
-| `int32_pairs` атрибуты | `integer[]` (фильтры по атрибутам идут в OpenSearch, индекс в PostgreSQL не нужен) | — | `Array(UInt32)` | — |
-| `float16x128` эмбеддинг | — | — | — | `varbinary` 256 Б |
+| `users`, `sessions`, `favorites`, справочники | PostgreSQL main | Транзакции и уникальность. ~0,25 ТБ, запись редкая — хватает одного мастера |
+| `ads`, `ad_photos` | PostgreSQL, 8 шардов | Строгая запись, продавец сразу видит свои изменения. ~1,1 ТБ |
+| `chats`, `chat_members` | PostgreSQL, 4 шарда | Уникальность диалога, 7,7 тыс. строк/с записи |
+| `messages` | Cassandra | Только дописывание и чтение последней страницы, пишет в локальный ДЦ |
+| Фото | Ceph (S3) | 2,8 ПБ неизменяемых файлов, раздача через CDN |
+| `search_index` | OpenSearch | Полнотекстовый поиск с фильтрами |
+| `rec_events` | ClickHouse | ~127 тыс. вставок/с пачками, удаление по TTL |
+| DWH | ClickHouse, отдельный кластер | Отчёты по году истории, колоночное сжатие |
+| `user_features`, `ad_features` | Tarantool | 528 тыс. чтений/с из памяти, WAL на диске |
+| Кэши, SMS-коды, онлайн-соединения | Redis Cluster | Данные с TTL, потеря не критична |
+| Очереди | Kafka | Несколько потребителей, порядок внутри ключа |
 
 ### 6.3. Индексы
 
-| Таблица | Индекс | Для какого запроса |
-| --- | --- | --- |
-| `users` | `UNIQUE (phone)` | Вход по номеру |
-| `sessions` | `UNIQUE (refresh_token_hash)`, `(user_id)` | Обновление сессии, выход со всех устройств |
-| `ads` | `(seller_id, status, created_at DESC)` | «Мои объявления» |
-| `ads` | `(closed_at)` частичный, `WHERE status = 'closed'` | Удаление снятых объявлений старше 30 дней. В индекс попадают только снятые объявления (~34 млн из 254 млн), поэтому он маленький |
-| `ad_photos` | `(ad_id, position)` | Фото карточки по порядку |
-| `favorites` | PK `(user_id, ad_id)` | Список избранного и проверка «в избранном» одним индексом |
-| `chat_members` | `(user_id, last_message_at DESC)` | Список диалогов, отсортированный по последнему сообщению |
-| `chats` | PK `chat_id` | `chat_id` — 128-битный хэш от `(ad_id, buyer_id)`, поэтому отдельный уникальный индекс по паре не нужен и дубль диалога невозможен даже между шардами. Диалог создаётся через `INSERT ... ON CONFLICT (chat_id) DO NOTHING`, затем сервис проверяет, что у строки совпадают `ad_id` и `buyer_id` |
-| `messages` | Clustering key `message_id DESC` | Последняя страница истории читается одним последовательным чтением |
-| `search_index` | Инвертированный индекс по тексту, числовые поля фильтров `category_id`, `city_id`, `price_kop` | Поиск |
-| `rec_events` | `ORDER BY (user_id, ts)` | Выборка событий пользователя для признаков |
-| `fact_ad_events` | `PARTITION BY toYYYYMM(ts)`, `ORDER BY (category_id, city_id, ts)`, skip-индекс `bloom_filter(ad_id)` | Отчёты по категориям и городам за период; статистика одного объявления |
-| `fact_messages` | `ORDER BY (ad_id, ts)` | Конверсия «просмотр → сообщение» по объявлениям |
-| `dim_*` | `ORDER BY` первичный ключ | Соединение с фактами |
+Кроме первичных ключей:
 
-В остальных таблицах доступ только по первичному ключу.
-
-Поле `ads.closed_at` нужно именно для индекса на удаление архива. `updated_at` для этого не подходит: он меняется при любом редактировании, а срок хранения архива отсчитывается от снятия.
+- `users (phone)` UNIQUE — вход по номеру;
+- `sessions (refresh_token_hash)` UNIQUE и `(user_id)` — обновление сессии и выход со всех устройств;
+- `ads (seller_id, status, created_at DESC)` — «Мои объявления»; частичный `ads (closed_at) WHERE status = 'closed'` — удаление архива старше 30 дней;
+- `ad_photos (ad_id, position)` — фото карточки по порядку;
+- `chat_members (user_id, last_message_at DESC)` — список диалогов;
+- `messages`: clustering key `message_id DESC` — последняя страница истории;
+- `search_index` — инвертированный индекс по тексту и числовые фильтры;
+- ClickHouse: `rec_events ORDER BY (user_id, ts)`, `fact_ad_events ORDER BY (category_id, city_id, ts)`.
 
 ### 6.4. Денормализация
 
-- **`search_index` хранит `title`, `price_kop`, `city_id` и `thumb_photo_id`.** Страницу поиска можно отдать прямо из OpenSearch, не обращаясь к `ads`. Это убирает 5,3 тыс. пакетных чтений в секунду из `ads` (половину нагрузки на наполнение выдачи из раздела 5).
-- **`ads.main_photo_id`.** Для ленты и избранного нужна только миниатюра, поэтому `ad_photos` читается только при открытии карточки. Хранится число на 8 Б, ключ файла `photo_id/variant` собирается из него.
-- **`ad_card_cache` содержит объявление, фото и имя продавца.** Карточка собирается одним запросом в Redis.
-- **`chats.last_message_preview` и `chat_members.last_message_at`.** Список диалогов строится без обращения к `messages`. Цена — при отправке сообщения обновляются строка диалога и две строки участников. Они лежат на разных шардах (`chats` по `chat_id`, `chat_members` по `user_id`), поэтому общей транзакции нет. Сообщение сначала пишется в Cassandra, после этого клиент получает ответ. Затем событие из топика `message-delivery` обновляет превью и счётчики. Каждое обновление атомарно в пределах своей строки и идемпотентно: счётчик увеличивается условным `UPDATE ... WHERE last_message_id < $message_id`, поэтому повторная обработка того же события ничего не меняет. Топик партиционирован по `chat_id`, так что события одного диалога обрабатываются по порядку. По требованиям 5.4 счётчик непрочитанных может отставать на доли секунды.
-- **`chat_id = hash(ad_id, buyer_id)`.** Это не совсем денормализация, но так уникальность диалога обеспечивается без глобального индекса. Хэш берётся 128-битный: у 64-битного при ~830 млн диалогов в год вероятность хотя бы одной коллизии около 2%, у 128-битного она пренебрежимо мала. Повторное создание того же диалога попадает в `ON CONFLICT` и возвращает существующий `chat_id`. Если у найденной строки другие `ad_id` и `buyer_id`, это коллизия: запрос завершается ошибкой и попадает в мониторинг, а не склеивает два разных диалога.
-- **`fact_ad_events.category_id` и `city_id` в DWH.** Самые частые отчёты группируют по категории и городу. Без этих полей пришлось бы соединять триллион строк фактов с `dim_ad`.
+- `search_index` хранит `title`, `price_kop`, `city_id`, `thumb_photo_id` — выдача поиска без обращения к `ads`.
+- `ads.main_photo_id` — миниатюра для ленты и избранного без `ad_photos`.
+- `chats.last_message_preview` и `chat_members.last_message_at` — список диалогов без `messages`. Строки лежат на разных шардах, поэтому обновляются асинхронно из `message-delivery`, идемпотентно по `message_id`.
+- `fact_ad_events.category_id`, `city_id` — отчёты без соединения с `dim_ad`.
 
-Денормализованные копии обновляются из топика `ad-changes`, поэтому на несколько секунд могут отставать — это допустимо по требованиям из раздела 5.4.
+Копии отстают на секунды, это допустимо по требованиям из раздела 5.4.
 
 ### 6.5. Шардирование и резервирование
 
-| Хранилище | Шардирование | Репликация | Объём с репликами |
-| --- | --- | --- | --- |
-| PostgreSQL main | Нет | Мастер + синхронная реплика в Москве, асинхронные реплики в Екатеринбурге и Новосибирске | ~0,25 ТБ × 4 |
-| PostgreSQL ads | 8 шардов, `hash(ad_id)` через 256 виртуальных бакетов | Так же, как main, для каждого шарда | ~1,1 ТБ × 4 |
-| PostgreSQL chats | 4 шарда: `chats` по `chat_id`, `chat_members` по `user_id` | Так же | ~0,55 ТБ × 4 |
-| Cassandra | Токены по `chat_id` | RF = 3 в каждом ДЦ (NetworkTopologyStrategy) | ~8,5 ТБ × 9 ≈ 77 ТБ в год |
-| Ceph | По ключу объекта | Оригиналы — erasure coding 8+3, производные версии — 3 копии | ~4 330 ТБ в основном ДЦ + ~3 500 ТБ копия оригиналов во втором ДЦ |
-| OpenSearch | 22 шарда по ~60 ГБ | 1 реплика, полная копия индекса в каждом ДЦ | 1,3 ТБ × 2 × 3 |
-| ClickHouse events | 2 шарда по `user_id` | 2 реплики, только в Москве | ~0,85 ТБ × 2 после сжатия |
-| ClickHouse DWH | 4 шарда по `cityHash64(user_id)` | 2 реплики, только в Москве | ~11,5 ТБ × 2 после сжатия за год |
-| Tarantool | vshard, бакеты по `user_id` / `ad_id` | Мастер + реплика, своя копия в каждом ДЦ | ~0,13 ТБ × 2 × 3 в памяти |
-| Redis | 16 слотовых групп | Мастер + реплика, отдельный кластер в каждом ДЦ | ~0,15 ТБ × 2 на ДЦ |
-| Kafka | Партиции по `user_id` / `ad_id` / `chat_id`, для `cdc.*` — по первичному ключу строки | RF = 3 | ~0,65 ТБ × 3 |
+| Данные | Шардирование | Резервирование |
+| --- | --- | --- |
+| PostgreSQL main | Нет | Мастер + синхронная реплика в Москве, асинхронные реплики в Екатеринбурге и Новосибирске |
+| PostgreSQL ads | 8 шардов, `hash(ad_id)` через 256 бакетов | Так же для каждого шарда |
+| PostgreSQL chats | 4 шарда: `chats` по `chat_id`, `chat_members` по `user_id` | Так же |
+| Cassandra | По `chat_id` | RF = 3 в каждом ДЦ, `LOCAL_QUORUM` |
+| Ceph | По ключу объекта | Оригиналы — EC 8+3 и копия во втором ДЦ, производные версии — 3 копии |
+| OpenSearch | 22 шарда по `ad_id` | 1 реплика, копия индекса в каждом ДЦ |
+| ClickHouse events / DWH | 2 / 4 шарда по `user_id` | 2 реплики, Москва |
+| Tarantool | vshard по `user_id` / `ad_id` | Мастер + реплика в каждом ДЦ |
+| Redis | 16 шардов по слотам | Мастер + реплика в каждом ДЦ |
+| Kafka | Партиции по ключу сообщения | RF = 3 |
 
-Почему так:
+- Бакеты нужны, чтобы добавить шард переносом бакетов, без перехэширования всех данных.
+- `chat_id` — 128-битный хэш от `(ad_id, buyer_id)`, поэтому на пару приходится один диалог без глобального уникального индекса.
+- По `seller_id` и `city_id` не шардируем из-за горячих ключей (раздел 5.5).
 
-- **Запись в PostgreSQL идёт в Москву**, а чтения — в реплики своего ДЦ. Запись в эти таблицы редкая (сотни QPS), поэтому лишние 30–50 мс для Урала и Сибири не критичны. Мастер-мастер для объявлений не используем, чтобы не решать конфликты.
-- **Виртуальные бакеты.** `ad_id` сначала отображается в один из 256 бакетов, бакеты распределены по 8 шардам. Чтобы добавить шард, переносятся бакеты целиком, перехэшировать все данные не нужно. Таблица «бакет → шард» хранится в etcd.
-- **«Мои объявления» при шардировании по `ad_id`** требуют запроса во все 8 шардов. Это редкий запрос, поэтому дешевле, чем держать второй ключ шардирования.
-- **Cassandra пишет в локальный ДЦ** с `LOCAL_QUORUM`, между ДЦ реплицирует асинхронно. Чат продолжает работать при отказе Москвы. В каждом ДЦ RF = 3: тогда `LOCAL_QUORUM` — это 2 из 3 реплик, и отказ одного узла не останавливает запись и чтение. При RF = 2 кворум был бы 2 из 2, и любой упавший узел делал бы часть диалогов недоступной.
-- **Ceph:** оригиналы читаются почти только при повторной обработке, поэтому для них выбрано экономное erasure coding: 2 542 ТБ × 11/8 ≈ 3 495 ТБ. Производные версии читаются часто, поэтому хранятся в 3 копиях: (254 + 25) ТБ × 3 ≈ 839 ТБ. Оригиналы дополнительно копируются во второй ДЦ (тоже EC 8+3), производные версии можно сгенерировать заново.
-- **Шардирование по `seller_id` и `city_id` не используется** из-за горячих ключей (раздел 5.5).
-- **ClickHouse для событий уменьшился** после перехода на числовые поля: 30 дней событий — 3,4 ТБ до сжатия и ~0,85 ТБ после (сжатие ~4×). Двух шардов хватает и по объёму, и для вставки ~127 тыс. строк/с пачками.
-- **DWH — отдельный кластер ClickHouse.** У него другой срок хранения (год, а не 30 дней) и другая нагрузка: ночные отчёты по триллиону строк не должны тормозить расчёт признаков для ленты. 46 ТБ до сжатия ≈ 11,5 ТБ после, по ~2,9 ТБ на шард. Кластер только в Москве: его пользователи — внутренние аналитики, данные из других ДЦ приходят через Kafka.
-
-### 6.6. Клиентские библиотеки и балансировка запросов
+### 6.6. Клиентские библиотеки и подключения
 
 Сервисы пишутся на Go.
 
-| Хранилище | Библиотека | Балансировка и подключения |
-| --- | --- | --- |
-| PostgreSQL | `pgx` | PgBouncer в режиме transaction pooling перед каждым шардом: тысячи соединений от подов сводятся к ~100 на сервер. Мастер определяется через Patroni. Выбор шарда — в общей библиотеке по таблице бакетов, чтения уходят в реплики |
-| Cassandra | `gocql` | Token-aware и DC-aware политика: запрос идёт сразу на узел, где лежит партиция, в своём ДЦ |
-| OpenSearch | `opensearch-go` | Запросы на координирующие узлы через L4-балансировщик |
-| ClickHouse | `clickhouse-go` | Вставки пачками через Kafka Engine / consumer, без вставок по одной строке. Аналитики и дашборды ходят в DWH через chproxy: лимиты на время запроса и число одновременных запросов на пользователя |
-| CDC в DWH | Debezium (Kafka Connect) | По коннектору на каждый шард PostgreSQL: читает WAL через слот логической репликации и пишет изменения в топики `cdc.*` с ключом по первичному ключу строки |
-| Tarantool | `go-tarantool` + vshard-router | Роутер знает расположение бакетов, клиент держит одно мультиплексированное соединение на роутер |
-| Redis | `go-redis` (cluster client) | Клиент сам знает слоты, пайплайнинг для пакетного чтения карточек |
-| Kafka | `franz-go` | Ключ сообщения задаёт партицию, consumer groups для каждого потребителя |
-| S3 | `aws-sdk-go` | Через балансировщик RGW. Клиенты загружают фото по presigned URL, минуя сервисы |
+- PostgreSQL — `pgx` + PgBouncer (transaction pooling, ~100 соединений на сервер), мастер определяет Patroni.
+- Cassandra — `gocql` с token-aware и DC-aware политикой.
+- Redis — `go-redis` cluster client; Tarantool — `go-tarantool` + vshard-router; Kafka — `franz-go`.
+- ClickHouse — `clickhouse-go`, вставки пачками; аналитики ходят в DWH через chproxy.
+- Ceph — фото загружаются клиентами по presigned URL; CDC в DWH — Debezium.
 
 ### 6.7. Резервное копирование
 
-| Хранилище | Как | Срок |
-| --- | --- | --- |
-| PostgreSQL | WAL-G: полный бэкап раз в сутки + непрерывная архивация WAL в S3. Можно восстановиться на любой момент времени | 14 дней |
-| Cassandra | Ночные снапшоты + инкрементальные бэкапы через Medusa в S3 | 14 дней |
-| ClickHouse events | `clickhouse-backup` раз в сутки. События частично можно потерять | 7 дней |
-| ClickHouse DWH | `clickhouse-backup`: полный бэкап раз в неделю + инкрементальный ежедневно. Kafka хранит только 3 дня, поэтому историю за год без бэкапа не восстановить | 30 дней |
-| Ceph | Оригиналы копируются во второй ДЦ, производные версии восстанавливаются из оригиналов | Пока фото существует |
-| OpenSearch | Снапшоты в S3 раз в сутки, чтобы не переиндексировать с нуля. Источник истины — PostgreSQL | 3 дня |
-| Tarantool | Свои снапшоты и WAL на диске; в крайнем случае признаки пересчитываются из ClickHouse | — |
-| Redis, Kafka | Не бэкапятся: кэши строятся заново, в Kafka данные хранятся 3 дня с RF = 3 | — |
-
-Бэкапы хранятся в отдельном бакете Ceph в другом ДЦ. Раз в месяц восстановление проверяется на тестовом стенде.
+- PostgreSQL — WAL-G: полный бэкап раз в сутки + архив WAL, восстановление на любой момент за 14 дней.
+- Cassandra — Medusa, 14 дней. ClickHouse — `clickhouse-backup`: события 7 дней, DWH 30 дней.
+- Ceph — копия оригиналов во втором ДЦ. OpenSearch, Tarantool и Redis восстанавливаются из исходных данных.
+- Бэкапы хранятся в Ceph в другом ДЦ, раз в месяц восстановление проверяется на тестовом стенде.
 
 ## Список источников
 
