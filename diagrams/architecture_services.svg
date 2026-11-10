@@ -1,0 +1,158 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1370" viewBox="0 0 1400 1370" role="img" aria-labelledby="title desc">
+<title id="title">Сервисы и доступ к данным</title><desc id="desc">Логические сервисы и их ресурсы. Межсервисная композиция использует API объявлений. Повторённые названия Redis и PostgreSQL main обозначают соответствующие логические данные, а не отдельные обязательные инсталляции.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L10 4 L0 8 Z" fill="#334155"/></marker><marker id="event" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L10 4 L0 8 Z" fill="#7c3aed"/></marker></defs>
+<rect width="1400" height="1370" fill="white"/>
+<text x="36" y="44" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#172a44" text-anchor="start">
+<tspan x="36" dy="0">Сервисы и доступ к данным</tspan>
+</text>
+<text x="36" y="79" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="400" fill="#526277" text-anchor="start">
+<tspan x="36" dy="0">Вход: NGINX. Внутри: Kubernetes Service / gRPC. Справа указаны только разрешённые ресурсы.</tspan>
+</text>
+<rect x="40" y="120" width="390" height="125" rx="8" fill="#edf5ff" stroke="#4d82bf" stroke-width="1.6"/>
+<text x="58" y="150" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#172a44" text-anchor="start">
+<tspan x="58" dy="0">API пользователей</tspan>
+</text>
+<text x="58" y="181" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="400" fill="#172a44" text-anchor="start">
+<tspan x="58" dy="0">/auth · сессии · SMS</tspan>
+</text>
+<rect x="865" y="120" width="495" height="125" rx="8" fill="#fff6e8" stroke="#c69040" stroke-width="1.6"/>
+<text x="883" y="150" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#172a44" text-anchor="start">
+<tspan x="883" dy="0">PostgreSQL main / Redis</tspan>
+</text>
+<text x="883" y="181" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="400" fill="#172a44" text-anchor="start">
+<tspan x="883" dy="0">users · sessions / SMS-коды</tspan>
+<tspan x="883" dy="25.56">Внешний вызов SMS-провайдера</tspan>
+</text>
+<polyline points="430,182 865,182" fill="none" stroke="#334155" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<text x="647" y="163" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="400" fill="#475569" text-anchor="middle">
+<tspan x="647" dy="0">pgx / Redis / HTTPS</tspan>
+</text>
+<rect x="40" y="285" width="390" height="125" rx="8" fill="#edf5ff" stroke="#4d82bf" stroke-width="1.6"/>
+<text x="58" y="315" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#172a44" text-anchor="start">
+<tspan x="58" dy="0">API объявлений и фото</tspan>
+</text>
+<text x="58" y="346" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="400" fill="#172a44" text-anchor="start">
+<tspan x="58" dy="0">/ads · метаданные · URL фото</tspan>
+</text>
+<rect x="865" y="285" width="495" height="125" rx="8" fill="#fff6e8" stroke="#c69040" stroke-width="1.6"/>
+<text x="883" y="315" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#172a44" text-anchor="start">
+<tspan x="883" dy="0">PostgreSQL ads / Ceph / Redis</tspan>
+</text>
+<text x="883" y="346" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="400" fill="#172a44" text-anchor="start">
+<tspan x="883" dy="0">ads · ad_photos · ad_outbox</tspan>
+<tspan x="883" dy="25.56">Оригиналы фото / AD_CARD_CACHE</tspan>
+</text>
+<polyline points="430,347 865,347" fill="none" stroke="#334155" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<text x="647" y="328" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="400" fill="#475569" text-anchor="middle">
+<tspan x="647" dy="0">pgx / S3 / Redis</tspan>
+</text>
+<text x="647" y="380" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="400" fill="#6542a0" text-anchor="middle">
+<tspan x="647" dy="0">outbox → см. потоки событий</tspan>
+</text>
+<rect x="40" y="450" width="390" height="125" rx="8" fill="#edf5ff" stroke="#4d82bf" stroke-width="1.6"/>
+<text x="58" y="480" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#172a44" text-anchor="start">
+<tspan x="58" dy="0">API избранного</tspan>
+</text>
+<text x="58" y="511" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="400" fill="#172a44" text-anchor="start">
+<tspan x="58" dy="0">/favorites · список ID</tspan>
+</text>
+<rect x="865" y="450" width="495" height="125" rx="8" fill="#fff6e8" stroke="#c69040" stroke-width="1.6"/>
+<text x="883" y="480" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#172a44" text-anchor="start">
+<tspan x="883" dy="0">PostgreSQL main</tspan>
+</text>
+<text x="883" y="511" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="400" fill="#172a44" text-anchor="start">
+<tspan x="883" dy="0">favorites</tspan>
+<tspan x="883" dy="25.56">Отдельные права на свои таблицы</tspan>
+</text>
+<polyline points="430,512 865,512" fill="none" stroke="#334155" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<text x="647" y="493" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="400" fill="#475569" text-anchor="middle">
+<tspan x="647" dy="0">pgx / PgBouncer</tspan>
+</text>
+<rect x="40" y="615" width="390" height="125" rx="8" fill="#edf5ff" stroke="#4d82bf" stroke-width="1.6"/>
+<text x="58" y="645" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#172a44" text-anchor="start">
+<tspan x="58" dy="0">API поиска</tspan>
+</text>
+<text x="58" y="676" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="400" fill="#172a44" text-anchor="start">
+<tspan x="58" dy="0">/search · фильтры · выдача</tspan>
+</text>
+<rect x="865" y="615" width="495" height="125" rx="8" fill="#fff6e8" stroke="#c69040" stroke-width="1.6"/>
+<text x="883" y="645" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#172a44" text-anchor="start">
+<tspan x="883" dy="0">OpenSearch</tspan>
+</text>
+<text x="883" y="676" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="400" fill="#172a44" text-anchor="start">
+<tspan x="883" dy="0">search_index</tspan>
+<tspan x="883" dy="25.56">Обновление индексатором через Kafka</tspan>
+</text>
+<polyline points="430,677 865,677" fill="none" stroke="#334155" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<text x="647" y="658" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="400" fill="#475569" text-anchor="middle">
+<tspan x="647" dy="0">HTTP API</tspan>
+</text>
+<rect x="40" y="780" width="390" height="125" rx="8" fill="#edf5ff" stroke="#4d82bf" stroke-width="1.6"/>
+<text x="58" y="810" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#172a44" text-anchor="start">
+<tspan x="58" dy="0">API ленты + CatBoost</tspan>
+</text>
+<text x="58" y="841" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="400" fill="#172a44" text-anchor="start">
+<tspan x="58" dy="0">/feed · ранжирование по gRPC</tspan>
+</text>
+<rect x="865" y="780" width="495" height="125" rx="8" fill="#fff6e8" stroke="#c69040" stroke-width="1.6"/>
+<text x="883" y="810" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#172a44" text-anchor="start">
+<tspan x="883" dy="0">OpenSearch / Tarantool / Redis</tspan>
+</text>
+<text x="883" y="841" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="400" fill="#172a44" text-anchor="start">
+<tspan x="883" dy="0">ad_vectors / признаки</tspan>
+<tspan x="883" dy="25.56">FEED_CACHE · popular · fresh</tspan>
+</text>
+<polyline points="430,842 865,842" fill="none" stroke="#334155" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<text x="647" y="823" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="400" fill="#475569" text-anchor="middle">
+<tspan x="647" dy="0">k-NN / batch reads</tspan>
+</text>
+<rect x="40" y="945" width="390" height="125" rx="8" fill="#edf5ff" stroke="#4d82bf" stroke-width="1.6"/>
+<text x="58" y="975" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#172a44" text-anchor="start">
+<tspan x="58" dy="0">Чат + WebSocket-шлюзы</tspan>
+</text>
+<text x="58" y="1006" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="400" fill="#172a44" text-anchor="start">
+<tspan x="58" dy="0">/chats · история · /messages</tspan>
+</text>
+<rect x="865" y="945" width="495" height="125" rx="8" fill="#fff6e8" stroke="#c69040" stroke-width="1.6"/>
+<text x="883" y="975" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#172a44" text-anchor="start">
+<tspan x="883" dy="0">PostgreSQL chats / Cassandra / Redis</tspan>
+</text>
+<text x="883" y="1006" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="400" fill="#172a44" text-anchor="start">
+<tspan x="883" dy="0">Диалоги / история сообщений</tspan>
+<tspan x="883" dy="25.56">online · dedup; отправка через Kafka</tspan>
+</text>
+<polyline points="430,1007 865,1007" fill="none" stroke="#334155" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<text x="647" y="988" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="400" fill="#475569" text-anchor="middle">
+<tspan x="647" dy="0">pgx / gocql / Redis</tspan>
+</text>
+<text x="647" y="1040" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="400" fill="#6542a0" text-anchor="middle">
+<tspan x="647" dy="0">Kafka → см. потоки событий</tspan>
+</text>
+<text x="40" y="1123" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#172a44" text-anchor="start">
+<tspan x="40" dy="0">Межсервисная композиция: карточки и проверка объявления</tspan>
+</text>
+<rect x="40" y="1150" width="535" height="105" rx="8" fill="#edf5ff" stroke="#4d82bf" stroke-width="1.6"/>
+<text x="58" y="1180" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#172a44" text-anchor="start">
+<tspan x="58" dy="0">Избранное / лента / создание чата</tspan>
+</text>
+<text x="58" y="1211" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="400" fill="#172a44" text-anchor="start">
+<tspan x="58" dy="0">Получают данные чужой предметной области</tspan>
+</text>
+<rect x="865" y="1150" width="495" height="105" rx="8" fill="#edf5ff" stroke="#4d82bf" stroke-width="1.6"/>
+<text x="883" y="1180" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="700" fill="#172a44" text-anchor="start">
+<tspan x="883" dy="0">API объявлений</tspan>
+</text>
+<text x="883" y="1211" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="400" fill="#172a44" text-anchor="start">
+<tspan x="883" dy="0">Тот же владелец ads, что во второй строке</tspan>
+</text>
+<polyline points="575,1202 865,1202" fill="none" stroke="#334155" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow)"/>
+<text x="720" y="1180" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="400" fill="#475569" text-anchor="middle">
+<tspan x="720" dy="0">gRPC · пакет ID</tspan>
+</text>
+<text x="40" y="1302" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="400" fill="#172a44" text-anchor="start">
+<tspan x="40" dy="0">Приём событий Go пишет в Kafka. Индексаторы, фото, DWH и обучение показаны отдельно.</tspan>
+</text>
+<text x="40" y="1335" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="400" fill="#526277" text-anchor="start">
+<tspan x="40" dy="0">Ресурсы и таблицы общих кластеров разделены правами. Чужие таблицы через SQL не читаются.</tspan>
+</text>
+</svg>
