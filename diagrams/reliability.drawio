@@ -1,0 +1,174 @@
+<mxfile host="app.diagrams.net" compressed="false">
+  <diagram id="reliability" name="ДЗ 9 · Надёжность">
+    <mxGraphModel grid="1" gridSize="10" page="1" pageWidth="1200" pageHeight="744">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="panel0" parent="1" vertex="1" value="ОНЛАЙН · Запросы и запасные ответы" style="rounded=1;arcSize=4;html=1;align=left;verticalAlign=top;spacingTop=11;spacingLeft=16;fontStyle=1;fontColor=#334155;fillColor=#f8fbff;strokeColor=#bdcee5;">
+          <mxGeometry x="20" y="20" width="740" height="362" as="geometry" />
+        </mxCell>
+        <mxCell id="panel1" parent="1" vertex="1" value="ФОН" style="rounded=1;arcSize=4;html=1;align=left;verticalAlign=top;spacingTop=11;spacingLeft=16;fontStyle=1;fontColor=#334155;fillColor=#fcfaff;strokeColor=#d8cbea;">
+          <mxGeometry x="20" y="405" width="740" height="294" as="geometry" />
+        </mxCell>
+        <mxCell id="panel2" parent="1" vertex="1" value="КОНТРОЛЬ И ВОССТАНОВЛЕНИЕ" style="rounded=1;arcSize=4;html=1;align=left;verticalAlign=top;spacingTop=11;spacingLeft=16;fontStyle=1;fontColor=#334155;fillColor=#fffdfa;strokeColor=#ead2b6;">
+          <mxGeometry x="780" y="20" width="400" height="679" as="geometry" />
+        </mxCell>
+        <mxCell id="client" parent="1" vertex="1" value="&lt;b&gt;Клиенты&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;веб / мобильные&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#eff6ff;strokeColor=#3769b1;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="45" y="70" width="142" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="entry" parent="1" vertex="1" value="&lt;b&gt;Вход в ДЦ&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;VRRP / IPVS · NGINX&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#eff6ff;strokeColor=#3769b1;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="233" y="70" width="251" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="api" parent="1" vertex="1" value="&lt;b&gt;API и WebSocket&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;реплики на разных узлах&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#eff6ff;strokeColor=#3769b1;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="530" y="70" width="204" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="ads" parent="1" vertex="1" value="&lt;b&gt;Объявления&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;сохранение карточки&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#eff6ff;strokeColor=#3769b1;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="45" y="184" width="204" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="chat" parent="1" vertex="1" value="&lt;b&gt;Чат&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;Redis: ключ повтора&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#eff6ff;strokeColor=#3769b1;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="276" y="184" width="204" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="read" parent="1" vertex="1" value="&lt;b&gt;Поиск и лента&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;OpenSearch · Tarantool&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#eff6ff;strokeColor=#3769b1;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="510" y="184" width="224" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="pg" parent="1" vertex="1" value="&lt;b&gt;PostgreSQL ads&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;объявление + outbox&lt;br&gt;одна транзакция&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#ecfdf5;strokeColor=#13776b;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="45" y="272" width="204" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="safe" parent="1" vertex="1" value="&lt;b&gt;Запасной ответ&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;поиск: карточки по ссылке&lt;br&gt;лента: популярное из Redis&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#fff7ed;strokeColor=#b86a1f;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="510" y="272" width="224" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="cdc" parent="1" vertex="1" value="&lt;b&gt;Debezium&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;читает журнал WAL&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#f5f3ff;strokeColor=#795ab2;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="45" y="449" width="204" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="adc" parent="1" vertex="1" value="&lt;b&gt;Kafka · ad-changes&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;доставка изменений&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#f5f3ff;strokeColor=#795ab2;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="45" y="534" width="204" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="index" parent="1" vertex="1" value="&lt;b&gt;Воркеры объявлений&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;версия индекса + сверка&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#f5f3ff;strokeColor=#795ab2;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="45" y="621" width="204" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="msg" parent="1" vertex="1" value="&lt;b&gt;Kafka · message-delivery&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;подтверждение: «принято»&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#f5f3ff;strokeColor=#795ab2;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="276" y="449" width="204" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="worker" parent="1" vertex="1" value="&lt;b&gt;Воркер чата&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;повтор с тем же message_id&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#f5f3ff;strokeColor=#795ab2;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="276" y="534" width="204" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="cassandra" parent="1" vertex="1" value="&lt;b&gt;Cassandra&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;«сохранено» → WS / push&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#ecfdf5;strokeColor=#13776b;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="276" y="621" width="204" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="kafkarepl" parent="1" vertex="1" value="&lt;b&gt;Копии Kafka&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;по одной на ДЦ&lt;br&gt;запись: две актуальные&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#fff7ed;strokeColor=#b86a1f;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="510" y="449" width="224" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="offline" parent="1" vertex="1" value="&lt;b&gt;Фоновые задачи&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;ClickHouse: отчёты ждут&lt;br&gt;лента берёт текущую модель&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#f5f3ff;strokeColor=#795ab2;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="510" y="558" width="224" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="checks" parent="1" vertex="1" value="&lt;b&gt;Проверки доступности&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;DNS исключает целый ДЦ&lt;br&gt;балансировщик — экземпляр&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#fff7ed;strokeColor=#b86a1f;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="806" y="70" width="348" height="72" as="geometry" />
+        </mxCell>
+        <mxCell id="promotion" parent="1" vertex="1" value="&lt;b&gt;Переключение PostgreSQL&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;Patroni: переключаем на синхронную&lt;br&gt;реплику, старый primary изолируем&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#fff7ed;strokeColor=#b86a1f;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="806" y="164" width="348" height="72" as="geometry" />
+        </mxCell>
+        <mxCell id="remote" parent="1" vertex="1" value="&lt;b&gt;Копии в других ДЦ&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;асинхронные: возможна потеря&lt;br&gt;последних записей&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#fff7ed;strokeColor=#b86a1f;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="806" y="250" width="348" height="72" as="geometry" />
+        </mxCell>
+        <mxCell id="watch" parent="1" vertex="1" value="&lt;b&gt;Метрики и алерты&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;ошибки, задержка, отставание Kafka&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#fff7ed;strokeColor=#b86a1f;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="806" y="336" width="348" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="backup" parent="1" vertex="1" value="&lt;b&gt;Задачи бэкапа&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;PostgreSQL + WAL, Cassandra, ClickHouse&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#f5f3ff;strokeColor=#795ab2;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="806" y="449" width="348" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="vault" parent="1" vertex="1" value="&lt;b&gt;Ceph в другом ДЦ&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;храним резервные копии отдельно&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#ecfdf5;strokeColor=#13776b;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="806" y="534" width="348" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="restore" parent="1" vertex="1" value="&lt;b&gt;Проверка восстановления&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:13px;color:#475569&quot;&gt;раз в месяц на тестовом стенде&lt;/span&gt;" style="rounded=1;arcSize=16;html=1;whiteSpace=wrap;fillColor=#fff7ed;strokeColor=#b86a1f;strokeWidth=1.25;fontFamily=Arial;fontSize=16;fontColor=#0f172a;">
+          <mxGeometry x="806" y="621" width="348" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="e0" parent="1" edge="1" source="client" target="entry" style="edgeStyle=segmentEdgeStyle;rounded=0;jettySize=0;html=1;strokeWidth=2;strokeColor=#3769b1;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" parent="1" edge="1" source="entry" target="api" style="edgeStyle=segmentEdgeStyle;rounded=0;jettySize=0;html=1;strokeWidth=2;strokeColor=#3769b1;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" parent="1" edge="1" source="api" style="edgeStyle=segmentEdgeStyle;rounded=0;jettySize=0;html=1;strokeWidth=2;strokeColor=#3769b1;endArrow=none;exitX=0.5;exitY=1;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="147" y="158" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="632" y="158" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e3" parent="1" edge="1" target="ads" style="edgeStyle=segmentEdgeStyle;rounded=0;jettySize=0;html=1;strokeWidth=2;strokeColor=#3769b1;endArrow=block;endFill=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="147.0" y="158" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e4" parent="1" edge="1" target="chat" style="edgeStyle=segmentEdgeStyle;rounded=0;jettySize=0;html=1;strokeWidth=2;strokeColor=#3769b1;endArrow=block;endFill=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="378.0" y="158" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e5" parent="1" edge="1" target="read" style="edgeStyle=segmentEdgeStyle;rounded=0;jettySize=0;html=1;strokeWidth=2;strokeColor=#3769b1;endArrow=block;endFill=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="622.0" y="158" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e6" parent="1" edge="1" source="ads" target="pg" style="edgeStyle=segmentEdgeStyle;rounded=0;jettySize=0;html=1;strokeWidth=2;strokeColor=#3769b1;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" parent="1" edge="1" source="read" target="safe" style="edgeStyle=segmentEdgeStyle;rounded=0;jettySize=0;html=1;strokeWidth=2;strokeColor=#b86a1f;endArrow=block;endFill=1;dashed=1;dashPattern=5 4;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" parent="1" edge="1" source="pg" target="cdc" style="edgeStyle=segmentEdgeStyle;rounded=0;jettySize=0;html=1;strokeWidth=2;strokeColor=#7856ad;endArrow=block;endFill=1;dashed=1;dashPattern=5 4;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" parent="1" edge="1" source="cdc" target="adc" style="edgeStyle=segmentEdgeStyle;rounded=0;jettySize=0;html=1;strokeWidth=2;strokeColor=#7856ad;endArrow=block;endFill=1;dashed=1;dashPattern=5 4;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" parent="1" edge="1" source="adc" target="index" style="edgeStyle=segmentEdgeStyle;rounded=0;jettySize=0;html=1;strokeWidth=2;strokeColor=#7856ad;endArrow=block;endFill=1;dashed=1;dashPattern=5 4;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" parent="1" edge="1" source="chat" target="msg" style="edgeStyle=segmentEdgeStyle;rounded=0;jettySize=0;html=1;strokeWidth=2;strokeColor=#7856ad;endArrow=block;endFill=1;dashed=1;dashPattern=5 4;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" parent="1" edge="1" source="msg" target="worker" style="edgeStyle=segmentEdgeStyle;rounded=0;jettySize=0;html=1;strokeWidth=2;strokeColor=#7856ad;endArrow=block;endFill=1;dashed=1;dashPattern=5 4;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" parent="1" edge="1" source="worker" target="cassandra" style="edgeStyle=segmentEdgeStyle;rounded=0;jettySize=0;html=1;strokeWidth=2;strokeColor=#3769b1;endArrow=block;endFill=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e14" parent="1" edge="1" source="backup" target="vault" style="edgeStyle=segmentEdgeStyle;rounded=0;jettySize=0;html=1;strokeWidth=2;strokeColor=#7856ad;endArrow=block;endFill=1;dashed=1;dashPattern=5 4;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e15" parent="1" edge="1" source="vault" target="restore" style="edgeStyle=segmentEdgeStyle;rounded=0;jettySize=0;html=1;strokeWidth=2;strokeColor=#b86a1f;endArrow=block;endFill=1;dashed=1;dashPattern=5 4;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="legendedge0" parent="1" edge="1" style="edgeStyle=segmentEdgeStyle;rounded=0;jettySize=0;html=1;strokeWidth=2;strokeColor=#3769b1;endArrow=block;endFill=1;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="47" y="722" as="sourcePoint" />
+            <mxPoint x="87" y="722" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="legendtext0" parent="1" vertex="1" value="Запрос или запись" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacing=0;fontSize=14;fontColor=#475569;">
+          <mxGeometry x="98" y="713" width="290" height="19" as="geometry" />
+        </mxCell>
+        <mxCell id="legendedge1" parent="1" edge="1" style="edgeStyle=segmentEdgeStyle;rounded=0;jettySize=0;html=1;strokeWidth=2;strokeColor=#7856ad;endArrow=block;endFill=1;dashed=1;dashPattern=5 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="333" y="722" as="sourcePoint" />
+            <mxPoint x="373" y="722" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="legendtext1" parent="1" vertex="1" value="Обработка событий и копий" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacing=0;fontSize=14;fontColor=#475569;">
+          <mxGeometry x="384" y="713" width="290" height="19" as="geometry" />
+        </mxCell>
+        <mxCell id="legendedge2" parent="1" edge="1" style="edgeStyle=segmentEdgeStyle;rounded=0;jettySize=0;html=1;strokeWidth=2;strokeColor=#b86a1f;endArrow=block;endFill=1;dashed=1;dashPattern=5 4;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="708" y="722" as="sourcePoint" />
+            <mxPoint x="748" y="722" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="legendtext2" parent="1" vertex="1" value="Переключение и запасной ответ" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacing=0;fontSize=14;fontColor=#475569;">
+          <mxGeometry x="759" y="713" width="290" height="19" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
